@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function AuthPage() {
@@ -8,6 +9,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   async function signUp() {
   setLoading(true);
@@ -39,22 +41,40 @@ export default function AuthPage() {
 }
 
   async function signIn() {
-    setLoading(true);
-    setMessage("");
+  setLoading(true);
+  setMessage("");
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-    if (error) {
-      setMessage(error.message);
-    } else {
-      setMessage("Login successful");
-    }
-
+  if (error) {
+    setMessage(error.message);
     setLoading(false);
+    return;
   }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user?.id)
+    .single();
+
+  if (!profile?.role) {
+    router.push("/role");
+  } else if (profile.role === "owner") {
+    router.push("/dashboard/owner");
+  } else if (profile.role === "sitter") {
+    router.push("/dashboard/sitter");
+  }
+
+  setLoading(false);
+}
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-[var(--cream)]">

@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function RolePage() {
   const [role, setRole] = useState("");
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   async function saveRole() {
     setMessage("");
@@ -25,11 +27,15 @@ export default function RolePage() {
   .eq("id", user.id);
 
     if (error) {
-      setMessage(error.message);
-    } else {
-      setMessage("Role saved successfully");
-    }
-  
+  setMessage(error.message);
+} else {
+  if (role === "owner") {
+    router.push("/dashboard/owner");
+  } else if (role === "sitter") {
+    router.push("/dashboard/sitter");
+  }
+}
+
   }
 
   return (
