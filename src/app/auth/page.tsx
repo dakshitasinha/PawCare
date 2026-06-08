@@ -10,22 +10,33 @@ export default function AuthPage() {
   const [message, setMessage] = useState("");
 
   async function signUp() {
-    setLoading(true);
-    setMessage("");
+  setLoading(true);
+  setMessage("");
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
 
-    if (error) {
-      setMessage(error.message);
-    } else {
-      setMessage("Signup successful. Check your email (or login).");
-    }
-
+  if (error) {
+    setMessage(error.message);
     setLoading(false);
+    return;
   }
+
+  const user = data.user;
+
+  if (user) {
+    await supabase.from("profiles").insert({
+      id: user.id,
+      email: user.email,
+      role: null,
+    });
+  }
+
+  setMessage("Signup successful. Now login.");
+  setLoading(false);
+}
 
   async function signIn() {
     setLoading(true);

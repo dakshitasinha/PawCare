@@ -19,17 +19,17 @@ export default function RolePage() {
       return;
     }
 
-    const { error } = await supabase.from("profiles").insert({
-      id: user.id,
-      email: user.email,
-      role: role,
-    });
+    const { error } = await supabase
+  .from("profiles")
+  .update({ role: role })
+  .eq("id", user.id);
 
     if (error) {
       setMessage(error.message);
     } else {
       setMessage("Role saved successfully");
     }
+  
   }
 
   return (
