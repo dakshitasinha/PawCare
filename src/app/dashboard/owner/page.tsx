@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function OwnerDashboard() {
   const sitters = [
     {
@@ -52,9 +54,12 @@ export default function OwnerDashboard() {
                   {sitter.area}
                 </p>
 
-                <button className="mt-5 w-full rounded-2xl bg-[var(--sage)] py-3 font-medium">
-                  Request Booking
-                </button>
+                <Link
+  href="/bookings/new"
+  className="mt-5 block w-full rounded-2xl bg-[var(--sage)] py-3 text-center font-medium"
+>
+  Request Booking
+</Link>
               </div>
             </div>
           ))}
