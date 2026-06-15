@@ -1,6 +1,17 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+
+type Booking = {
+  id: string;
+  pet_name: string;
+  status: string;
+};
 
 export default function OwnerDashboard() {
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const sitters = [
     {
       id: 1,
@@ -21,6 +32,28 @@ export default function OwnerDashboard() {
       image: "https://api.dicebear.com/7.x/adventurer/svg?seed=Ananya",
     },
   ];
+
+useEffect(() => {
+  loadBookings();
+}, []);
+
+async function loadBookings() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  const { data } = await supabase
+    .from("bookings")
+    .select("id, pet_name, status")
+    .eq("owner_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (data) {
+    setBookings(data);
+  }
+}
 
   return (
     <main className="min-h-screen bg-[var(--cream)] p-8">
@@ -55,15 +88,37 @@ export default function OwnerDashboard() {
                 </p>
 
                 <Link
-  href="/bookings/new"
-  className="mt-5 block w-full rounded-2xl bg-[var(--sage)] py-3 text-center font-medium"
->
-  Request Booking
-</Link>
+                 href="/bookings/new"
+                     className="mt-5 block w-full rounded-2xl bg-[var(--sage)] py-3 text-center font-medium"
+          >
+              Request Booking
+                </Link>
               </div>
             </div>
           ))}
         </div>
+        <div className="mx-auto mt-16 max-w-5xl">
+  <h2 className="mb-6 text-3xl font-bold">
+    My Booking Requests
+  </h2>
+
+  <div className="space-y-4">
+    {bookings.map((booking) => (
+      <div
+        key={booking.id}
+        className="rounded-3xl bg-white p-6 shadow"
+      >
+        <h3 className="text-xl font-semibold">
+          {booking.pet_name}
+        </h3>
+
+        <p className="mt-2 font-medium">
+          Status: {booking.status}
+        </p>
+      </div>
+    ))}
+  </div>
+</div>
       </div>
     </main>
   );
