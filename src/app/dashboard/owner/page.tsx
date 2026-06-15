@@ -9,37 +9,24 @@ type Booking = {
   pet_name: string;
   status: string;
 };
+type Sitter = {
+  id: string;
+  full_name: string;
+  area: string;
+  photo_url: string;
+};
 
 export default function OwnerDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const sitters = [
-    {
-      id: 1,
-      name: "Priya Sharma",
-      area: "Madhapur",
-      image: "https://api.dicebear.com/7.x/adventurer/svg?seed=Priya",
-    },
-    {
-      id: 2,
-      name: "Rahul Verma",
-      area: "Gachibowli",
-      image: "https://api.dicebear.com/7.x/adventurer/svg?seed=Rahul",
-    },
-    {
-      id: 3,
-      name: "Ananya Reddy",
-      area: "Kondapur",
-      image: "https://api.dicebear.com/7.x/adventurer/svg?seed=Ananya",
-    },
-  ];
+  const [sitters, setSitters] = useState<Sitter[]>([]);
 
 useEffect(() => {
   loadBookings();
+  loadSitters();
 }, []);
 
 async function loadBookings() {
-  const {
-    data: { user },
+  const { data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) return;
@@ -55,6 +42,17 @@ async function loadBookings() {
   }
 }
 
+async function loadSitters() {
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, full_name, area, photo_url")
+    .eq("role", "sitter")
+.not("full_name", "is", null);
+
+  if (data) {
+    setSitters(data);
+  }
+}
   return (
     <main className="min-h-screen bg-[var(--cream)] p-8">
       <div className="mx-auto max-w-6xl">
@@ -73,14 +71,14 @@ async function loadBookings() {
               className="overflow-hidden rounded-3xl bg-white shadow-lg transition-all hover:-translate-y-2 hover:shadow-xl"
             >
               <img
-                src={sitter.image}
-                alt={sitter.name}
+                src={sitter.photo_url}
+                alt={sitter.full_name}
                 className="h-56 w-full object-cover"
               />
 
               <div className="p-6">
                 <h2 className="text-xl font-semibold">
-                  {sitter.name}
+                  {sitter.full_name}
                 </h2>
 
                 <p className="mt-2 text-black/60">
