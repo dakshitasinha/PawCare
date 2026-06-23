@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function NewBookingPage() {
@@ -11,6 +12,8 @@ export default function NewBookingPage() {
   const [endDate, setEndDate] = useState("");
   const [notes, setNotes] = useState("");
   const [message, setMessage] = useState("");
+  const searchParams = useSearchParams();
+const sitterId = searchParams.get("sitterId");
 
   async function createBooking() {
     setMessage("");
@@ -26,6 +29,7 @@ export default function NewBookingPage() {
 
     const { error } = await supabase.from("bookings").insert({
       owner_id: user.id,
+      sitter_id: sitterId,
       pet_name: petName,
       pet_type: petType,
       area,

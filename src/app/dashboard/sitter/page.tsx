@@ -34,15 +34,22 @@ export default function SitterDashboard() {
 }
 
   async function loadBookings() {
-    const { data } = await supabase
-      .from("bookings")
-      .select("*")
-      .order("created_at", { ascending: false });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    if (data) {
-      setBookings(data);
-    }
+  if (!user) return;
+
+  const { data } = await supabase
+    .from("bookings")
+    .select("*")
+    .eq("sitter_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (data) {
+    setBookings(data);
   }
+}
 
   return (
     <main className="min-h-screen bg-[var(--cream)] p-8">

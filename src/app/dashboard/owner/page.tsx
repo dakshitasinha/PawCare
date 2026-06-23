@@ -86,11 +86,11 @@ async function loadSitters() {
                 </p>
 
                 <Link
-                 href="/bookings/new"
-                     className="mt-5 block w-full rounded-2xl bg-[var(--sage)] py-3 text-center font-medium"
-          >
-              Request Booking
-                </Link>
+  href={`/bookings/new?sitterId=${sitter.id}`}
+  className="mt-5 block w-full rounded-2xl bg-[var(--sage)] py-3 text-center font-medium"
+>
+  Request Booking
+</Link>
               </div>
             </div>
           ))}
